@@ -1,0 +1,7 @@
+# Accent color for each post category, used as the left-border color on
+# home page post cards. Keys must match the `categories:` front-matter
+# strings exactly. Categories with no entry here fall back to a neutral
+# theme-aware color automatically.
+
+Projects: "#10b981"
+Theory: "#8b5cf6"

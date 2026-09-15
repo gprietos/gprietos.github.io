@@ -1,0 +1,75 @@
+#home-banner {
+  margin: 0.5rem 0 1.75rem;
+
+  .banner-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--heading-color);
+    margin-bottom: 0.35rem;
+  }
+
+  .banner-subtitle {
+    font-size: 1rem;
+    color: var(--text-muted-color);
+    margin-bottom: 0;
+  }
+}
+
+#post-list {
+  .card-wrapper .card {
+    border-left: 4px solid var(--category-accent, var(--categories-border));
+    transition: border-color 0.2s ease;
+  }
+}
+
+/* Sidebar hidden by default at every width (not just mobile), revealed via
+   the existing sidebar-trigger toggle. Overrides the theme's desktop
+   always-visible sidebar by appending after it in the stylesheet, so equal
+   specificity resolves in our favor regardless of viewport width. The
+   sidebar overlays on top of the content (via the theme's own z-2/mask
+   stacking) instead of pushing it, so the main content never shifts and
+   there's no horizontal overflow. */
+#sidebar {
+  transition: transform 0.4s ease;
+  transform: translateX(-260px);
+}
+
+[sidebar-display] #sidebar {
+  transform: translateX(0);
+}
+
+#main-wrapper {
+  margin-left: 260px; /* experiment: permanently shift content right by the sidebar's width */
+}
+
+/* Cap and center the main content column (topbar/search, article text, and
+   the Recently Updated / Trending Tags panel) now that the sidebar no
+   longer permanently reserves space. Mirrors the theme's own >=1650px cap
+   (1250px) down to the 850px breakpoint, replacing Bootstrap's mismatched
+   intermediate steps (720/960/1140/1320px) that otherwise apply there. */
+@media (min-width: 850px) {
+  #main-wrapper > .container {
+    max-width: 1250px;
+  }
+}
+
+#sidebar-trigger {
+  display: block;
+  order: -1; /* sit before #breadcrumb so it's flush at the left edge on desktop */
+  z-index: 3; /* stays above the mask/sidebar overlay when open */
+  transform: translateX(-260px); /* experiment: permanently shift left by the sidebar's width */
+}
+
+@media (min-width: 1650px) {
+  #sidebar {
+    transform: translateX(-300px);
+  }
+
+  #main-wrapper {
+    margin-left: 300px;
+  }
+
+  #sidebar-trigger {
+    transform: translateX(-300px);
+  }
+}
