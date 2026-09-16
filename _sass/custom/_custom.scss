@@ -7,6 +7,16 @@
   scrollbar-gutter: stable;
 }
 
+/* The mask (shown behind the always-overlay sidebar) is wired by the
+   theme's own JS to close the sidebar on click - the built-in "tap
+   outside to dismiss" behavior meant for the original mobile-only
+   overlay. Since the sidebar is now an overlay at every width, disable
+   that: clicks pass through the mask to the page content instead,
+   so the sidebar only closes via its own trigger button. */
+#mask {
+  pointer-events: none;
+}
+
 #home-banner {
   margin: 0.5rem 0 1.75rem;
 
