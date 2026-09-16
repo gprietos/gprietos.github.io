@@ -1,3 +1,12 @@
+/* Force a permanently-reserved scrollbar gutter at every width (the theme
+   only does this itself at >=850px), so navigating between a short page
+   (no scrollbar) and a tall page (scrollbar present) never shifts centered
+   content sideways. */
+:root {
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
 #home-banner {
   margin: 0.5rem 0 1.75rem;
 
@@ -42,14 +51,61 @@
   margin-left: 260px; /* experiment: permanently shift content right by the sidebar's width */
 }
 
-/* Cap and center the main content column (topbar/search, article text, and
-   the Recently Updated / Trending Tags panel) now that the sidebar no
-   longer permanently reserves space. Mirrors the theme's own >=1650px cap
-   (1250px) down to the 850px breakpoint, replacing Bootstrap's mismatched
-   intermediate steps (720/960/1140/1320px) that otherwise apply there. */
+/* Let the row (main text + panel) and the topbar (search icon) use the
+   full available width instead of a fixed cap, so the search icon and the
+   Recently Updated / Trending Tags panel can sit closer to the true right
+   edge of the screen. The reading content itself is capped and centered
+   separately (below), so the article text doesn't stretch edge-to-edge. */
 @media (min-width: 850px) {
   #main-wrapper > .container {
-    max-width: 1250px;
+    max-width: none;
+  }
+
+  .main-content-inner {
+    max-width: 900px;
+    margin-inline: auto;
+  }
+}
+
+/* Line the breadcrumb (Home > Categories > ...) up with the article text's
+   left edge. Scoped to >=1200px (xl), where <main> is a clean col-xl-9
+   (75%) - below that, the gem applies its own col-12/col-lg-11 + a
+   992-1199px-only 96% override, which would need separate formulas to
+   match exactly, so the breadcrumb is left as-is there.
+   The offset below replicates, in one calc(), the exact box model that
+   produces .main-content-inner's actual left edge inside <main>:
+     - #main-wrapper > .container > .row has its Bootstrap gutter margins
+       zeroed by the gem itself (base/_base.scss's `ml-mr(0)` on that
+       selector), so <main> (flex: 0 0 75%) starts flush at the row's
+       left edge with no bleed.
+     - <main>'s own padding-left is a constant 1.5rem (Bootstrap's
+       px-md-4 utility, active from 768px up).
+     - .main-content-inner then centers 900px within what's left of that
+       75%-wide column via margin-inline:auto - or, once that column is
+       narrower than 900px (roughly 1200-1524px viewports, depending on
+       exact container padding), doesn't offset at all, which is why the
+       formula is clamped with max() at <main>'s own left inset (1.5rem)
+       as a floor. */
+@media (min-width: 1200px) {
+  #topbar {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  #breadcrumb {
+    padding-left: 0;
+    margin-left: max(1.5rem, calc(37.5% - 450px));
+  }
+}
+
+/* Above 1650px the gem separately overrides <main>'s padding-right to
+   4.5rem (base/_base.scss's `main.col-12` rule, >=1650px only) - that
+   doesn't change <main>'s left edge, but it does narrow the column,
+   shifting .main-content-inner's centered position left by half of the
+   extra padding (1.5rem), which the breadcrumb's offset needs to match. */
+@media (min-width: 1650px) {
+  #breadcrumb {
+    margin-left: max(1.5rem, calc(37.5% - 1.5rem - 450px));
   }
 }
 
@@ -60,10 +116,11 @@
 #sidebar-trigger {
   display: block;
   position: fixed;
-  top: 0.5rem;
+  top: 50%;
   left: 1rem;
   z-index: 3; /* stays above the mask/sidebar overlay when open */
   transition: transform 0.4s ease;
+  transform: translateY(-50%);
 }
 
 #sidebar-trigger i {
@@ -71,7 +128,7 @@
 }
 
 [sidebar-display] #sidebar-trigger {
-  transform: translateX(260px); /* follow the sidebar's right edge */
+  transform: translateY(-50%) translateX(260px); /* follow the sidebar's right edge */
 }
 
 [sidebar-display] #sidebar-trigger i {
@@ -88,6 +145,6 @@
   }
 
   [sidebar-display] #sidebar-trigger {
-    transform: translateX(300px);
+    transform: translateY(-50%) translateX(300px);
   }
 }
