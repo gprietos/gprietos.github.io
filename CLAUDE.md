@@ -37,3 +37,4 @@ Almost everything is driven by `_config.yml` (title, tagline, `url`, social link
 
 - This repo intentionally excludes `tools/`, `README.md`, `LICENSE`, and gem/package files from the built site (see `exclude:` in `_config.yml`).
 - `.devcontainer/` provides a Jekyll devcontainer (VS Code) with Liquid/shell tooling preinstalled — not required for local development outside VS Code.
+- RSS: `jekyll-feed` still generates `/feed.xml` on every build (it's a default Chirpy gem dependency), but the RSS icon/link in the sidebar footer is disabled — the `rss` entry in `_data/contact.yml` is commented out. Uncomment it to re-add the sidebar link; no other changes are needed since the feed itself is always generated.
