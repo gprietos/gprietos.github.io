@@ -23,7 +23,7 @@ layout: compress
     <script>
       (function () {
         try {
-          if (localStorage.getItem('sidebar-open') === '1') {
+          if (localStorage.getItem('sidebar-open') !== '0') {
             document.body.setAttribute('sidebar-display', '');
             document.getElementById('sidebar').classList.add('z-2');
           }
@@ -37,11 +37,13 @@ layout: compress
 
         <div class="row flex-grow-1">
           <main aria-label="Main Content" class="col-12 col-lg-11 col-xl-9 px-md-4">
-            {% if layout.layout == 'default' %}
-              {% include refactor-content.html content=content lang=lang %}
-            {% else %}
-              {{ content }}
-            {% endif %}
+            <div class="main-content-inner">
+              {% if layout.layout == 'default' %}
+                {% include refactor-content.html content=content lang=lang %}
+              {% else %}
+                {{ content }}
+              {% endif %}
+            </div>
           </main>
 
           <!-- panel -->
@@ -104,7 +106,7 @@ layout: compress
         var STORAGE_KEY = 'sidebar-open';
 
         try {
-          if (localStorage.getItem(STORAGE_KEY) === '1') {
+          if (localStorage.getItem(STORAGE_KEY) !== '0') {
             trigger.click(); // reuses the theme's own toggle logic, keeps its internal state in sync
           }
         } catch (e) {}
