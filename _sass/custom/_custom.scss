@@ -159,6 +159,8 @@
   }
 }
 
-footer[aria-label="Site Info"] {
+footer[aria-label="Site Info"],
+.license-wrapper,
+.share-wrapper {
   opacity: 0.3;
 }
