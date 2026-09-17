@@ -158,3 +158,7 @@
     transform: translateY(-50%) translateX(300px);
   }
 }
+
+footer[aria-label="Site Info"] {
+  opacity: 0.3;
+}
