@@ -164,3 +164,11 @@ footer[aria-label="Site Info"],
 .share-wrapper {
   opacity: 0.3;
 }
+
+/* The theme auto-inserts a "•" before every <span> that follows another
+   <span> inside header .post-meta. The post-meta line now separates its
+   own pieces with "|" spans instead, so disable the theme's dot here to
+   avoid showing both. */
+header .post-meta span + span::before {
+  content: none;
+}

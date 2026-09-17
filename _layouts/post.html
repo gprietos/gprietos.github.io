@@ -20,63 +20,65 @@ script_includes:
       <p class="post-desc fw-light mb-4">{{ page.description }}</p>
     {% endif %}
 
-    <div class="post-meta text-muted">
+    <div class="post-meta text-muted d-flex flex-wrap align-items-center">
       <!-- published date -->
       <span>
         {{ site.data.locales[lang].post.posted }}
-        {% include datetime.html date=page.date tooltip=true lang=lang %}
+        {% include datetime.html date=page.date lang=lang %}
       </span>
 
       <!-- lastmod date -->
       {% if page.last_modified_at and page.last_modified_at != page.date %}
+        <span class="mx-1">|</span>
         <span>
           {{ site.data.locales[lang].post.updated }}
-          {% include datetime.html date=page.last_modified_at tooltip=true lang=lang %}
+          {% include datetime.html date=page.last_modified_at lang=lang %}
         </span>
       {% endif %}
 
-      <div class="d-flex justify-content-between">
-        <!-- author(s) -->
+      <span class="mx-1">|</span>
+
+      <!-- read time -->
+      {% include read-time.html content=content prompt=true lang=lang %}
+
+      <!-- pageviews -->
+      {% if site.pageviews.provider and site.analytics[site.pageviews.provider].id %}
+        <span class="mx-1">|</span>
         <span>
-          {% if page.author %}
-            {% assign authors = page.author %}
-          {% elsif page.authors %}
-            {% assign authors = page.authors %}
-          {% endif %}
-
-          {{ site.data.locales[lang].post.written_by }}
-
-          <em>
-            {% if authors %}
-              {% for author in authors %}
-                {% if site.data.authors[author].url -%}
-                  <a href="{{ site.data.authors[author].url }}">{{ site.data.authors[author].name }}</a>
-                {%- else -%}
-                  {{ site.data.authors[author].name }}
-                {%- endif %}
-                {% unless forloop.last %}{{ '</em>, <em>' }}{% endunless %}
-              {% endfor %}
-            {% else %}
-              <a href="{{ site.social.links[0] }}">{{ site.social.name }}</a>
-            {% endif %}
+          <em id="pageviews">
+            <i class="fas fa-spinner fa-spin small"></i>
           </em>
+          {{ site.data.locales[lang].post.pageview_measure }}
         </span>
+      {% endif %}
 
-        <div>
-          <!-- pageviews -->
-          {% if site.pageviews.provider and site.analytics[site.pageviews.provider].id %}
-            <span>
-              <em id="pageviews">
-                <i class="fas fa-spinner fa-spin small"></i>
-              </em>
-              {{ site.data.locales[lang].post.pageview_measure }}
-            </span>
+      <span class="mx-1">|</span>
+
+      <!-- author(s) -->
+      <span>
+        {% if page.author %}
+          {% assign authors = page.author %}
+        {% elsif page.authors %}
+          {% assign authors = page.authors %}
+        {% endif %}
+
+        Author:
+
+        <em>
+          {% if authors %}
+            {% for author in authors %}
+              {% if site.data.authors[author].url -%}
+                <a href="{{ site.data.authors[author].url }}">{{ site.data.authors[author].name }}</a>
+              {%- else -%}
+                {{ site.data.authors[author].name }}
+              {%- endif %}
+              {% unless forloop.last %}{{ '</em>, <em>' }}{% endunless %}
+            {% endfor %}
+          {% else %}
+            <a href="{{ site.social.links[0] }}">{{ site.social.name }}</a>
           {% endif %}
-
-          <!-- read time -->
-          {% include read-time.html content=content prompt=true lang=lang %}
-        </div>
-      </div>
+        </em>
+      </span>
     </div>
   </header>
 
