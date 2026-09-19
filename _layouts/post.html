@@ -26,21 +26,21 @@ script_includes:
 
       <!-- lastmod date -->
       {% if page.last_modified_at and page.last_modified_at != page.date %}
-        <span class="mx-1">|</span>
+        <span class="meta-sep">|</span>
         <span>
           {{ site.data.locales[lang].post.updated }}
           {% include datetime.html date=page.last_modified_at lang=lang %}
         </span>
       {% endif %}
 
-      <span class="mx-1">|</span>
+      <span class="meta-sep">|</span>
 
       <!-- read time -->
       {% include read-time.html content=content prompt=true lang=lang %}
 
       <!-- pageviews -->
       {% if site.pageviews.provider and site.analytics[site.pageviews.provider].id %}
-        <span class="mx-1">|</span>
+        <span class="meta-sep">|</span>
         <span>
           <em id="pageviews">
             <i class="fas fa-spinner fa-spin small"></i>
@@ -49,7 +49,7 @@ script_includes:
         </span>
       {% endif %}
 
-      <span class="mx-1">|</span>
+      <span class="meta-sep">|</span>
 
       <!-- author(s) -->
       <span>

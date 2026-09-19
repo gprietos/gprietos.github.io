@@ -179,6 +179,18 @@ footer[aria-label="Site Info"],
   }
 }
 
+/* Spacing for the "|" separators in header .post-meta. Bootstrap's `mx-1`
+   utility (used here previously) doesn't exist in this theme's bundled CSS
+   subset (only single-direction utilities like `me-1`/`ms-1` are included),
+   so it silently did nothing - the gap it appeared to produce locally was
+   actually just uncompressed HTML whitespace between tags, which vanishes
+   once compress_html minifies the production build (see _config.yml's
+   compress_html.ignore.envs: [development]). This real margin works in
+   both environments. */
+.meta-sep {
+  margin: 0 0.25rem;
+}
+
 /* The theme auto-inserts a "•" before every <span> that follows another
    <span> inside header .post-meta. The post-meta line now separates its
    own pieces with "|" spans instead, so disable the theme's dot here to
