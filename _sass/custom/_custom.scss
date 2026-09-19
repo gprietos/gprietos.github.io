@@ -72,7 +72,7 @@
   }
 
   .main-content-inner {
-    max-width: 900px;
+    max-width: 1100px;
     margin-inline: auto;
   }
 }
@@ -90,12 +90,11 @@
        left edge with no bleed.
      - <main>'s own padding-left is a constant 1.5rem (Bootstrap's
        px-md-4 utility, active from 768px up).
-     - .main-content-inner then centers 900px within what's left of that
-       75%-wide column via margin-inline:auto - or, once that column is
-       narrower than 900px (roughly 1200-1524px viewports, depending on
-       exact container padding), doesn't offset at all, which is why the
-       formula is clamped with max() at <main>'s own left inset (1.5rem)
-       as a floor. */
+     - .main-content-inner then centers 1100px (half-width 550px, used
+       below) within what's left of that 75%-wide column via
+       margin-inline:auto - or, once that column is narrower than 1100px,
+       doesn't offset at all, which is why the formula is clamped with
+       max() at <main>'s own left inset (1.5rem) as a floor. */
 @media (min-width: 1200px) {
   #topbar {
     padding-left: 0 !important;
@@ -104,7 +103,7 @@
 
   #breadcrumb {
     padding-left: 0;
-    margin-left: max(1.5rem, calc(37.5% - 450px));
+    margin-left: max(1.5rem, calc(37.5% - 550px));
   }
 }
 
@@ -115,7 +114,7 @@
    extra padding (1.5rem), which the breadcrumb's offset needs to match. */
 @media (min-width: 1650px) {
   #breadcrumb {
-    margin-left: max(1.5rem, calc(37.5% - 1.5rem - 450px));
+    margin-left: max(1.5rem, calc(37.5% - 1.5rem - 550px));
   }
 }
 
@@ -163,6 +162,21 @@ footer[aria-label="Site Info"],
 .license-wrapper,
 .share-wrapper {
   opacity: 0.3;
+}
+
+/* More breathing room between a markdown heading and the text right below
+   it than Bootstrap's default 0.5rem margin-bottom. Scoped to .content
+   (the rendered post/page body) so it doesn't affect UI headings like the
+   sidebar title. */
+.content {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    margin-bottom: 1rem;
+  }
 }
 
 /* The theme auto-inserts a "•" before every <span> that follows another
