@@ -2,12 +2,18 @@
 title: "Visual Radar"
 date: 2026-09-15
 categories: [Practical Projects]
-tags: [Practical Project, Visual Radar]
+tags: [Practical, Visual Radar]
 description: "Fusing real-time object detection, monocular depth estimation and inertial data to turn a single camera feed into a low-cost situational-awareness radar."
 ---
 
 # Introduction
 
+## AÑA
+
+### AÑAAAA
+### AÑAÑO
+
+## ÑE
 
 **Situational awareness** is the ability to understand an environment by perceiving its present elements,  comprehending their behaviour and predicting their near future status. It is a foundamental requirement for modern ground operation and automous vehicles and robotics, as these systems need to know precisely what surrounds them and where those target objects are relative to their own position at any given moment.
 
