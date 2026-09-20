@@ -24,3 +24,9 @@ Fortunately, moden **Deep Learning** advancements applied to **Computer Vision**
 That realization inspired me to build the **Visual Radar** system. By pairing real-time object detection with monocular depth estimation, the system infers the spatial positions of surrounding targets from a standard video feed. Fusing this visual intelligence with inertial measurements makes it possible to map those targets directly onto a dynamic, top-down bird's-eye view radar plot.
 
 The goal of the Visual Radar pipeline is to generate a real-time tactical map solely from monocular image and inertial data, providing situational awareness without the high cost or operational drawbacks of specialized sensors.
+
+<div class="right" style="width: 40%;" markdown="1">
+{% include embed/video.html src='/assets/videos/visual_radar/PinholeCameraModel.mp4' title='Pinhole camera model' %}
+</div>
+
+BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT BLOCK OF TEXT 
