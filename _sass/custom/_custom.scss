@@ -205,3 +205,14 @@ footer[aria-label="Site Info"],
 header .post-meta span + span::before {
   content: none;
 }
+
+/* tocbot (the TOC library) collapses a heading's nested sub-list once its
+   section is no longer the active one being scrolled through, via
+   max-height/overflow on `.is-collapsible .toc-list`, only expanding it
+   back via `.is-active-li`. Force every level to stay expanded instead,
+   so scrolling past an H2 doesn't hide its H3/H4 children. */
+#toc-wrapper .toc-list-item.is-collapsible .toc-list,
+#toc-popup-content .toc-list-item.is-collapsible .toc-list {
+  max-height: none !important;
+  overflow: visible !important;
+}

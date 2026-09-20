@@ -1,0 +1,28 @@
+<!--
+  The theme's own TOC init (bundled in post.min.js) hardcodes
+  `headingSelector: "h2, h3, h4"`, so H1 headings never show up in the
+  sidebar/popup table of contents even though the post's own H1
+  (the title) already carries `data-toc-skip` and would be safely
+  ignored. Re-run tocbot after the theme's own init with H1 included,
+  and with collapsing disabled (see the matching CSS override) so a
+  section's subheadings don't disappear once you scroll past it.
+-->
+<script>
+  window.addEventListener('load', function () {
+    if (typeof tocbot === 'undefined') return;
+    if (!document.querySelector('main article[data-toc="true"]')) return;
+
+    var isWide = window.matchMedia('(min-width: 1200px)').matches;
+
+    tocbot.init({
+      tocSelector: isWide ? '#toc' : '#toc-popup-content',
+      contentSelector: '.content',
+      ignoreSelector: '[data-toc-skip]',
+      headingSelector: 'h1, h2, h3, h4',
+      orderedList: false,
+      scrollSmooth: false,
+      headingsOffset: isWide ? 32 : 48,
+      collapseDepth: 6,
+    });
+  });
+</script>
