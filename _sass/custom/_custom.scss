@@ -10,11 +10,15 @@
 /* The mask (shown behind the always-overlay sidebar) is wired by the
    theme's own JS to close the sidebar on click - the built-in "tap
    outside to dismiss" behavior meant for the original mobile-only
-   overlay. Since the sidebar is now an overlay at every width, disable
-   that: clicks pass through the mask to the page content instead,
-   so the sidebar only closes via its own trigger button. */
-#mask {
-  pointer-events: none;
+   overlay. On desktop the sidebar is an overlay too, so disable that:
+   clicks pass through the mask to the page content instead, and the
+   sidebar only closes via its own trigger button. Scoped to desktop
+   only (>=850px) - below that, tap-outside-to-close via the mask is
+   exactly the theme's stock mobile behavior we want to keep. */
+@media (min-width: 850px) {
+  #mask {
+    pointer-events: none;
+  }
 }
 
 #home-banner {
@@ -41,24 +45,27 @@
   }
 }
 
-/* Sidebar hidden by default at every width (not just mobile), revealed via
-   the existing sidebar-trigger toggle. Overrides the theme's desktop
+/* Sidebar hidden by default on desktop (>=850px), revealed via the
+   existing sidebar-trigger toggle. Overrides the theme's desktop
    always-visible sidebar by appending after it in the stylesheet, so equal
-   specificity resolves in our favor regardless of viewport width. The
-   sidebar overlays on top of the content (via the theme's own z-2/mask
-   stacking) instead of pushing it, so the main content never shifts and
-   there's no horizontal overflow. */
-#sidebar {
-  transition: transform 0.4s ease;
-  transform: translateX(-260px);
-}
+   specificity resolves in our favor. The sidebar overlays on top of the
+   content (via the theme's own z-2/mask stacking) instead of pushing it,
+   so the main content never shifts and there's no horizontal overflow.
+   Scoped to desktop only - below 850px this falls through untouched to
+   the theme's own stock mobile sidebar CSS. */
+@media (min-width: 850px) {
+  #sidebar {
+    transition: transform 0.4s ease;
+    transform: translateX(-260px);
+  }
 
-[sidebar-display] #sidebar {
-  transform: translateX(0);
-}
+  [sidebar-display] #sidebar {
+    transform: translateX(0);
+  }
 
-#main-wrapper {
-  margin-left: 260px; /* experiment: permanently shift content right by the sidebar's width */
+  #main-wrapper {
+    margin-left: 260px; /* experiment: permanently shift content right by the sidebar's width */
+  }
 }
 
 /* Let the row (main text + panel) and the topbar (search icon) use the
@@ -125,30 +132,61 @@
   }
 }
 
+#sidebar-trigger {
+  display: block;
+}
+
+/* #sidebar-trigger holds two icons (see topbar.html): the theme's stock
+   hamburger for mobile, and this site's chevron for desktop. Show exactly
+   one per viewport, at the same 850px breakpoint used elsewhere here.
+   Selectors are scoped under #sidebar-trigger (not bare classes) so their
+   specificity beats Font Awesome's own `.fas { display: inline-block }`
+   base rule, which is loaded after this stylesheet and would otherwise
+   tie/override a same-specificity class selector. */
+#sidebar-trigger .sidebar-trigger-icon-desktop {
+  display: none;
+}
+
+@media (min-width: 850px) {
+  #sidebar-trigger .sidebar-trigger-icon-mobile {
+    display: none;
+  }
+
+  #sidebar-trigger .sidebar-trigger-icon-desktop {
+    display: inline-block;
+  }
+}
+
 /* Anchored to the viewport (not the document flow), so its position never
    depends on .container's width-dependent centering math — unlike earlier
    flow-based attempts, a flat translateX offset here is reliable at every
-   viewport width, the same way #sidebar's own fixed positioning already is. */
-#sidebar-trigger {
-  display: block;
-  position: fixed;
-  top: 50%;
-  left: 1rem;
-  z-index: 3; /* stays above the mask/sidebar overlay when open */
-  transition: transform 0.4s ease;
-  transform: translateY(-50%);
-}
+   viewport width, the same way #sidebar's own fixed positioning already is.
+   Scoped to desktop (>=850px) only: the theme hides #sidebar-trigger by
+   default and only shows it below 850px; since our desktop redesign also
+   hides the sidebar by default, force it visible here too, viewport-fixed
+   and chevron-styled. Below 850px this block doesn't apply, so the trigger
+   falls back to the theme's stock in-topbar hamburger button. */
+@media (min-width: 850px) {
+  #sidebar-trigger {
+    position: fixed;
+    top: 50%;
+    left: 1rem;
+    z-index: 3; /* stays above the mask/sidebar overlay when open */
+    transition: transform 0.4s ease;
+    transform: translateY(-50%);
+  }
 
-#sidebar-trigger i {
-  transition: transform 0.4s ease;
-}
+  .sidebar-trigger-icon-desktop {
+    transition: transform 0.4s ease;
+  }
 
-[sidebar-display] #sidebar-trigger {
-  transform: translateY(-50%) translateX(260px); /* follow the sidebar's right edge */
-}
+  [sidebar-display] #sidebar-trigger {
+    transform: translateY(-50%) translateX(260px); /* follow the sidebar's right edge */
+  }
 
-[sidebar-display] #sidebar-trigger i {
-  transform: rotate(180deg); /* chevron flips to point the other way */
+  [sidebar-display] .sidebar-trigger-icon-desktop {
+    transform: rotate(180deg); /* chevron flips to point the other way */
+  }
 }
 
 @media (min-width: 1650px) {

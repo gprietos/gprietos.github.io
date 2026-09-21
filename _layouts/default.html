@@ -23,7 +23,10 @@ layout: compress
     <script>
       (function () {
         try {
-          if (localStorage.getItem('sidebar-open') !== '0') {
+          var stored = localStorage.getItem('sidebar-open');
+          var isDesktop = window.matchMedia('(min-width: 850px)').matches;
+          var shouldOpen = stored === '1' || (stored === null && isDesktop);
+          if (shouldOpen) {
             document.body.setAttribute('sidebar-display', '');
             document.getElementById('sidebar').classList.add('z-2');
           }
@@ -106,7 +109,10 @@ layout: compress
         var STORAGE_KEY = 'sidebar-open';
 
         try {
-          if (localStorage.getItem(STORAGE_KEY) !== '0') {
+          var stored = localStorage.getItem(STORAGE_KEY);
+          var isDesktop = window.matchMedia('(min-width: 850px)').matches;
+          var shouldOpen = stored === '1' || (stored === null && isDesktop);
+          if (shouldOpen) {
             trigger.click(); // reuses the theme's own toggle logic, keeps its internal state in sync
           }
         } catch (e) {}
