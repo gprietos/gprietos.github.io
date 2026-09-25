@@ -16,7 +16,7 @@ timezone:
 
 title: DL with Guille # the main title
 
-tagline: A text-focused Jekyll theme # it will display as the subtitle
+tagline: Notes on Deep Learning, Computer Vision & Robotics # it will display as the subtitle
 
 # Welcome banner shown above the post list on the home page (page 1 only).
 home_banner:
@@ -24,7 +24,8 @@ home_banner:
   subtitle: "Practical, code-first notes on deep learning — models, papers, and experiments."
 
 description: >- # used by seo meta and the atom feed
-  A minimal, responsive and feature-rich Jekyll theme for technical writing.
+  Learning notes and hands-on mini-projects on deep learning, computer vision
+  and robotics by Guille.
 
 # Fill in the protocol & hostname for your site.
 # E.g. 'https://username.github.io', note that it does not end with a '/'.
