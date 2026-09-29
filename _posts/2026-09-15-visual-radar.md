@@ -226,9 +226,9 @@ We work with three distinct coordinate frames:
 
 When the camera body is level and facing North (all attitude angles zero), the body axes align directly with the ENU world axes.
 
-To express camera axes in body axes, we apply an axis-relabeling matrix $\mathbf{C}_{\text{body}}^{\text{cam}}$:
+To express camera axes in body axes, we apply an axis-relabeling matrix $\mathbf{R}_{\text{cam}\to\text{body}}$:
 
-$$\large \begin{bmatrix} X_b \\ Y_b \\ Z_b \end{bmatrix} = \underbrace{\begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}}_{\mathbf{C}_{\text{body}}^{\text{cam}} } \begin{bmatrix} X_c \\ Y_c \\ Z_c \end{bmatrix}$$
+$$\large \begin{bmatrix} X_b \\ Y_b \\ Z_b \end{bmatrix} = \underbrace{\begin{bmatrix} 1 & 0 & 0 \\ 0 & 0 & 1 \\ 0 & -1 & 0 \end{bmatrix}}_{\mathbf{R}_{\text{cam}\to\text{body}} } \begin{bmatrix} X_c \\ Y_c \\ Z_c \end{bmatrix}$$
 
 ### Reorienting the Ray to World Frame
 
@@ -262,9 +262,9 @@ $$\mathbf{R}_x$$ and $$\mathbf{R}_y$$ are the standard right-hand-rule rotations
 </div>
 
 
-Finally, chaining the axis relabeling with the attitude rotation gives the full Camera Pose Matrix. A ray in the camera frame is first relabeled into body axes by $$\mathbf{C}_{\text{body}}^{\text{cam}}$$, then rotated into the world by $$\mathbf{R}_{\text{body}\to\text{world}}$$: 
+Finally, chaining the axis relabeling with the attitude rotation gives the full Camera Pose Matrix. A ray in the camera frame is first relabeled into body axes by $$\mathbf{R}_{\text{cam}\to\text{body}}$$, then rotated into the world by $$\mathbf{R}_{\text{body}\to\text{world}}$$: 
 
-$$\vec{d}_{\text{world}} = \underbrace{\mathbf{R}_z(\psi) \cdot \mathbf{R}_x(\theta) \cdot \mathbf{R}_y(\phi) \cdot \mathbf{C}_{\text{body}}^{\text{cam}}}_{\mathbf{R}_{\text{cam}\to\text{world}}} \cdot \vec{r}_{\text{cam}}$$
+$$\vec{d}_{\text{world}} = \underbrace{\mathbf{R}_z(\psi) \cdot \mathbf{R}_x(\theta) \cdot \mathbf{R}_y(\phi) \cdot \mathbf{R}_{\text{cam}\to\text{body}}}_{\mathbf{R}_{\text{cam}\to\text{world}}} \cdot \vec{r}_{\text{cam}}$$
 
 
 <div style="width: 75%; margin: 0 auto;" markdown="1">
