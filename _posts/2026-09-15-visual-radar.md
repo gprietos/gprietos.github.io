@@ -10,9 +10,9 @@ description: "Fusing real-time object detection, monocular depth estimation and 
 
 # Overview
 
-Modern autonomous vehicles and ground operations depend on knowing exactly what surrounds them, but traditional sensors like LiDAR and traditional radar come with steep tradeoffs: high costs, complex setups, and active energy signals that give away a platform's position. On the other hand, standard cameras are lightweight, inexpensive, and low-power, yet they inherently collapse our 3D world into flat 2D images, losing critical distance information.
+Modern autonomous vehicles and ground operations depend on knowing exactly what surrounds them, but sensors like LiDAR and Radar come with steep tradeoffs: high costs, complex setups, and active energy signals that give away a platform's position. On the other hand, standard cameras are lightweight, inexpensive, and low-power, yet they inherently collapse our 3D world into flat 2D images, losing critical distance information.
 
-The **Visual Radar** bridges this gap. By pairing real-time object detection and monocular metric depth estimation with fundamental camera geometry and inertial sensor tracking, this system reconstructs the 3D position of surrounding targets solely from a standard video feed. The result is a dynamic, top-down radar map that delivers rich situational awareness without the heavy operational drawbacks or price of traditional specialized hardware.
+The **Visual Radar** bridges this gap. By pairing real-time object detection and monocular metric depth estimation with fundamental camera geometry and inertial data, this system is able to reconstruct the 3D position of surrounding targets. The result is a top-down radar map that delivers rich situational awareness without the heavy operational drawbacks or price of traditional specialized hardware.
 
 
 VIDEO DEMO!
@@ -98,16 +98,16 @@ Before making sense of the overall scene, the pipeline needs to identify what is
 ## Object Detection
 
 
-Object detection is a computer vision task used to identify and localize objects within an image or video. Unlike image classification, which assigns a label to an entire image, an object detector searches the image for individual targets and determines where each one is located.
+**Object detection** is a computer vision task used to **identify and localize objects within an image or video**. Unlike image classification, which assigns a label to an entire image, an object detector searches the image for individual targets and determines where each one is located.
 
 Under the hood, modern object detectors leverage deep neural backbones to extract hierarchical feature maps that are fused across scales to capture multi-scale semantic contexts. During inference, the network processes the image in a single forward pass and simultaneously predicts candidate object locations and classes using specialized detection heads. These predictions are then filtered and refined to produce the final set of detections.
 
 For every detection, the model outputs three main pieces of information:
-- Bounding box — The location of the detected object in the image. It is usually given in $$(x_1, y_1, x_2, y_2)$$ format, where each point corresponds to the coordinates of the corners framing the target’s position.
-- Class label — The predicted object category, what the model believes the object is. 
-- Confidence score — A probabilistic metric that reflects how certain the model is in that prediction.  
+- **Bounding box** — The location of the detected object in the image. It is usually given in $$(x_1, y_1, x_2, y_2)$$ format, where each point corresponds to the coordinates of the corners framing the target’s position.
+- **Class label** — The predicted object category, what the model believes the object is. 
+- **Confidence score** — A probabilistic metric that reflects how certain the model is in that prediction.  
 
-As a baseline for this initial implementation I will use RF-DETR, a transformer-based object detection model specialized for real time inference.
+As a baseline for this initial implementation I will use [RF-DETR](https://github.com/roboflow/rf-detr)[^rf-detr], a transformer-based object detection model specialized for real time inference.
 
 
 OBJECT DETECTION IMAGE!
@@ -127,7 +127,7 @@ There are two main categories for depth estimation:
 
 Target mapping requires actual spatial coordinates, so relative estimations fall short. This pipeline strictly demands metric depth.
 
-As a baseline for this project the Depth Anything 3 model will be used (specifically the `da3metric-large` weights) to generate dense, highly accurate metric depth maps across the scene.  Furthermore, the unified spatial understanding that this model provides when presented with multiple images or video frames could be utilized in later iterations of this project.
+As a baseline for this project the [Depth Anything 3](https://github.com/bytedance-seed/depth-anything-3)[^depth-anything-3] model will be used (specifically the `da3metric-large` weights) to generate dense, highly accurate metric depth maps across the scene.  Furthermore, the unified spatial understanding that this model provides when presented with multiple images or video frames could be utilized in later iterations of this project.
 
 > **Which pixel's depth represents the object?**
 >
@@ -145,7 +145,12 @@ Once the target's image location and depth are predicted, we need a mathematical
 
 ## The Pinhole Model
 
-The pinhole camera model mathematically describes how 3D points project onto a 2D image. However, the Visual Radar application requires the inverse: reconstructing 3D space by unprojecting 2D pixels. Consequently, this section inverts the traditional model while introducing a few simplifications and omissions.
+The [**pinhole camera model**](https://visionbook.mit.edu/imaging_geometry.html#d-camera-projections-in-homogeneous-coordinates) mathematically describes how 3D points project onto a 2D image. However, the Visual Radar application requires the inverse: reconstructing 3D space by unprojecting 2D pixels. Consequently, this section inverts the traditional model while introducing a few simplifications and omissions.
+
+<div style="width: 75%; margin: 0 auto;" markdown="1">
+{% include embed/video.html src='/assets/videos/visual_radar/PinholeCameraModel.mp4' title='Pinhole camera model' %}
+</div>
+
 
 ### Camera Coordinate System
 
@@ -169,7 +174,7 @@ $$K = \begin{bmatrix} f_x & 0 & c_x \\ 0 & f_y & c_y \\ 0 & 0 & 1 \end{bmatrix}$
 
 Here, $$(c_x, c_y)$$ is the **principal point** (where the optical axis pierces the image plane, usually near the image center), and $$f_x, f_y$$ are the focal lengths expressed in pixel units. Skew is assumed to be zero for modern digital sensors.
 
-For physical cameras, the intrinsic matrix $$K$$ is typically computed via **camera calibration**. When working with virtual cameras or synthetic renderings where the intrinsic matrix $$K$$ is unknown, $$f_x$$ and $$f_y$$ can be derived directly from the camera's horizontal ($$\text{FOV}_h$$ a) and vertical Field of View ($$\text{FOV}_v$$) long with the image dimensions ($$W, H$$):
+For physical cameras, the intrinsic matrix $$K$$ is typically computed via [**camera calibration**](https://docs.opencv.org/4.13.0/dc/dbb/tutorial_py_calibration.html). When working with virtual cameras or synthetic renderings where the intrinsic matrix $$K$$ is unknown, $$f_x$$ and $$f_y$$ can be derived directly from the camera's horizontal ($$\text{FOV}_h$$) and vertical ($$\text{FOV}_v$$) Field of View long with the image dimensions ($$W, H$$):
 
 $$f_x = \frac{W}{2 \cdot \tan\left(\frac{\text{FOV}_h}{2}\right)}\quad \quad f_y = \frac{H}{2 \cdot \tan\left(\frac{\text{FOV}_v}{2}\right)}$$
 
@@ -180,10 +185,6 @@ By applying the inverse intrinsic matrix $$K^{-1}$$ to our pixel coordinates in 
 $$\large \vec{r}_{\text{cam}} =\begin{bmatrix} x_{\text{cam}} \\ y_{\text{cam}} \\ 1 \end{bmatrix} = K^{-1} \begin{bmatrix} u \\ v \\ 1 \end{bmatrix} = \begin{bmatrix} \frac{u - c_x}{f_x} \\ \frac{v - c_y}{f_y} \\ 1 \end{bmatrix} $$
 
 At this stage, $$\vec{r}_{\text{cam}}$$ tells us the exact direction of the light ray passing through pixel $$(u, v)$$, but we still don't know how far along that ray the object surface lies.
-
-<div style="width: 75%; margin: 0 auto;" markdown="1">
-{% include embed/video.html src='/assets/videos/visual_radar/PinholeCameraModel.mp4' title='Pinhole camera model' %}
-</div>
 
 
 ## Depth vs Range 
@@ -252,7 +253,7 @@ $$\mathbf{R}_x$$ and $$\mathbf{R}_y$$ are the standard right-hand-rule rotations
 > - **Extrinsic (right to left, fixed world axes rotation):** rotate the ray by **Roll** about $$Y_w$$, then **Pitch** about $$X_w$$, then **Yaw** about $$Z_w$$. This is what the matrix does to the vector, step by step.
 > - **Intrinsic (left to right, moving body axes rotation):** turn the camera by **Yaw** to its heading, then **Pitch** it about its own right axis, then **Roll** it about its own viewing direction. This matches how we would physically aim a camera.
 >
-> Both readings produce the same matrix: **rotations about fixed axes in one order (Yaw $$\rightarrow$$ Pitch $$\rightarrow$$ Roll) equal rotations about moving axes in the reverse order (Roll $$\rightarrow$$ Pitch $$\rightarrow$$ Yaw).**
+> Both readings produce the same matrix: **rotations about fixed axes in one order (Yaw $$\rightarrow$$ Pitch $$\rightarrow$$ Roll) equal rotations about moving axes in the reverse order (Roll $$\rightarrow$$ Pitch $$\rightarrow$$ Yaw).**[^rotation-order]
 {: .prompt-info }
 
 
@@ -335,3 +336,12 @@ _Visual Radar display example. **person** class detection at $$R = 40\,\text{m}$
 
 
 # Future work
+
+# References
+
+[^rf-detr]: I. Robinson, P. Robicheaux, M. Popov, D. Ramanan, and N. Peri, "[RF-DETR: Real-Time Detection Transformer](https://arxiv.org/abs/2511.09554)," in *International Conference on Learning Representations (ICLR)*, 2026.
+
+[^depth-anything-3]: H. Lin, S. Chen, J. H. Liew, D. Y. Chen, Z. Li, G. Shi, J. Feng, and B. Kang, "[Depth Anything 3: Recovering the Visual Space from Any Views](https://arxiv.org/abs/2511.10647)," *arXiv preprint arXiv:2511.10647*, 2025.
+
+
+[^rotation-order]: D. Plein, "[Extrinsic & intrinsic rotation: Do I multiply from right or left?](https://dominicplein.medium.com/extrinsic-intrinsic-rotation-do-i-multiply-from-right-or-left-357c38c1abfd)," *Medium*.
