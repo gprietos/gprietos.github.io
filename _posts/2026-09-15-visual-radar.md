@@ -5,6 +5,9 @@ categories: [Practical Projects]
 tags: [Practical, Visual Radar]
 math: true
 description: "Fusing real-time object detection, monocular depth estimation and inertial data to turn a single camera feed into a low-cost situational-awareness radar."
+image:
+  path: /assets/img/visual_radar/visual_radar_cover.png
+  alt: "Visual Radar top-down view"
 ---
 
 
@@ -12,12 +15,13 @@ description: "Fusing real-time object detection, monocular depth estimation and 
 
 Modern autonomous vehicles and ground operations depend on knowing exactly what surrounds them, but sensors like LiDAR and Radar come with steep tradeoffs: high costs, complex setups, and active energy signals that give away a platform's position. On the other hand, standard cameras are lightweight, inexpensive, and low-power, yet they inherently collapse our 3D world into flat 2D images, losing critical distance information.
 
-The **Visual Radar** bridges this gap. By pairing real-time object detection and monocular metric depth estimation with fundamental camera geometry and inertial data, this system is able to reconstruct the 3D position of surrounding targets. The result is a top-down radar map that delivers rich situational awareness without the heavy operational drawbacks or price of traditional specialized hardware.
+The **Visual Radar** bridges this gap. By pairing real-time object detection and monocular metric depth estimation with camera geometry and inertial data, the system reconstructs the position of surrounding targets from a single camera. These targets are then plotted on a top-down radar map that delivers rich situational awareness.
 
+The full source code of the project is available on [GitHub](https://github.com/gprietos/Visual-Radar).
 
-VIDEO DEMO!
-
-
+<div style="width: 75%; margin: 0 auto;" markdown="1">
+{% include embed/video.html src='/assets/videos/visual_radar/VisualRadarDemo.mp4' title='Visual Radar Demo' %}
+</div>
 
 
 
@@ -58,37 +62,7 @@ Before diving into the detailed geometry and model choices, here is a high-level
 
 
 
-IMAGEN ESQUEMA PIPELINE!
-
-
-```
-┌──────────────────────────────────────────────────────────┐   ┌────────────────────────┐   ┌─────────────────────┐   
-|                     CAMERA FRAME                         │   │   CAMERA CALIBRATION   │   |         IMU         |   
-└──────────────┬─────────────────────────────┬─────────────┘   └────────────┬───────────┘   └──────────┬──────────┘   
-			   │                             │                              |                          |              
-			   ▼                             ▼                              |                          |              
-  ┌──────────────────────────┐  ┌──────────────────────────┐                |                          |              
-  │    DEPTH ESTIMATION      │  │     OBJECT DETECTION     │                |                          |              
-  └────────────┬─────────────┘  └──────┬─────────────┬─────┘                |                          |                          [Depth Map]          [Class Labels]  [Bounding Boxes]     [fx,fy,cx,cy]                    |              
-			   │                       |          |      │                  |                          |              
-			   │                       |          |      │                  |                          |              
-			   └──────────────┬────────c──────────┘      └───────┬──────────┘      ┌───────────────────┘              
-							  │        |                         |                 |                                  
-						  [z_depths]   |                    [camera ray]   [roll, pitch, yaw]                         
-							  │        |                      |    |               |                                  
-							  └────────c──────┬───────────────┘    └─────────┬─────┘                                  
-									   |   [range]                       [world_dir]                                  
-									   |	  └───────────────┬──────────────┘                                        
-									   |				[world points]                                                
-									   └───────────┐		  │                                                       
-												   │          |                                                       
-												   ▼		  ▼                                                       
-										  ┌──────────────────────────────────────┐                                    
-										  │          GROUND POLAR MAP            │                                    
-										  └──────────────────┬───────────────────┘                                    
-														[Polar Plot]                                                  
-```
-
+![Visual Radar pipeline](/assets/img/visual_radar/visual_radar_pipeline.png){: w="700" }
 
 
 # Deep learning Block
@@ -110,7 +84,8 @@ For every detection, the model outputs three main pieces of information:
 As a baseline for this initial implementation I will use [RF-DETR](https://github.com/roboflow/rf-detr)[^rf-detr], a transformer-based object detection model specialized for real time inference.
 
 
-OBJECT DETECTION IMAGE!
+![Object detection with RF-DETR](/assets/img/visual_radar/detection_figure.png){: w="700" }
+_Object Detection example_
 
 ## Monocular Depth Estimation
 
@@ -129,13 +104,13 @@ Target mapping requires actual spatial coordinates, so relative estimations fall
 
 As a baseline for this project the [Depth Anything 3](https://github.com/bytedance-seed/depth-anything-3)[^depth-anything-3] model will be used (specifically the `da3metric-large` weights) to generate dense, highly accurate metric depth maps across the scene.  Furthermore, the unified spatial understanding that this model provides when presented with multiple images or video frames could be utilized in later iterations of this project.
 
+![Metric depth estimation with Depth Anything 3](/assets/img/visual_radar/depth_figure.png){: w="700" }
+_Metric depth estimation example_
+
 > **Which pixel's depth represents the object?**
 >
-> A key detail here is deciding which depth value actually represents a given object. Standard object detectors give us bounding boxes, not precise pixel-level masks like in instance segmentation. For this iteration we will assume the center pixel of the bounding box represents the object, but this breaks down if the object has an unusual pose or a hole right in the middle. With instance segmentation, we could instead calculate the mean depth across all pixels belonging to the object mask, leading to much more accurate measurements.
+> A key detail here is deciding which depth value actually represents a given object. Standard object detectors give us bounding boxes, not precise pixel-level masks like in instance segmentation. For this iteration we will assume that a patch around the center pixel of the bounding box represents the object, but this breaks down if the object has an unusual pose or a hole right in the middle. With instance segmentation, we could instead calculate the median depth across all pixels belonging to the object mask, leading to much more accurate measurements.
 {: .prompt-warning }
-
-
-DEPTH ESTIMATION IMAGE!
 
 
 # Camera Geometry & Spatial Orientation
@@ -156,9 +131,9 @@ The [**pinhole camera model**](https://visionbook.mit.edu/imaging_geometry.html#
 
 We define our 3D reference frame centered at the camera's focal point (the optical center, where all light rays intersect) called the **Camera Coordinate System**. Following standard computer vision conventions:
 
-- $$Z_c$$ (Optical Axis): Points straight ahead into the scene, representing depth.    
-- **$$X_c$$:** Points horizontally to the right.    
-- **$$Y_c$$:** Points vertically downwards.
+- $$Z_c$$ (Optical Axis) — Points straight ahead into the scene, representing depth.    
+- **$$X_c$$** — Points horizontally to the right.    
+- **$$Y_c$$** — Points vertically downwards.
 
 In the traditional physical camera model, light projects through the optical center onto a sensor placed behind it, flipping the image. To simplify the math, we place a virtual **normalized image plane** at a fixed distance of $$Z_c = 1$$ in front of the optical center. This removes physical lens dependencies and allows us to work purely with ray directions.
 
@@ -332,10 +307,22 @@ _Visual Radar display example. **person** class detection at $$R = 40\,\text{m}$
 
 
 
-# Issues and Limitations
+# Limitations and Future Work
+
+The Visual Radar works as a proof of concept, but several assumptions along the pipeline introduce errors that end up as misplaced, missing or phantom targets on the radar. Most of them point directly to the next iterations of the project:
+
+- **Depth assignment $$\rightarrow$$ Instance segmentation:** The depth of each target is taken from a patch around the center of its bounding box, which can fall on the background or on an occluding object. An instance segmentation model would allow computing the depth as the median over the mask pixels, although its precision, detection range and inference speed should be compared against the object detector to evaluate the tradeoff.
+
+- **Static camera $$\rightarrow$$ GPS and visual odometry:** Right now the camera is treated as fixed and its translation is ignored, so on a moving platform the radar is only relative to the current camera position. GPS would place the camera and every target on a global map. Positions could be further refined fusing GPS and IMU data through a Kalman filter. Visual odometry could also be explored to estimate the camera motion from the video itself, for instance leveraging the multi-view capabilities of Depth Anything 3.
+
+- **No temporal consistency $$\rightarrow$$ Target tracking:** Each frame is processed independently, so targets have no identity, velocity or predicted motion. Depth fluctuations make targets predicted position jitter, false positives present on a single frame appear immediately and targets simply vanish when occluded. A multi-object tracker with a Kalman filter would give each target a persistent identity, estimate its velocity, smooth its range, filter out spurious detections and bridge short occlusions, while Re-Identification (ReID) models can recover identities after longer occlusions.
+
+- **Compute and latency $$\rightarrow$$ Multi-task architecture and model optimization:** Running two models per frame makes real-time performance challenging, specially on low-power hardware. Both RF-DETR and Depth Anything 3 are built on the self-supervised DINOv2 backbone, so a single shared encoder with separate detection and depth estimation heads would be much more efficient. On top of that, compilation with TensorRT or ONNX and FP16 or INT8 quantization can further reduce latency.
+
+- **Measurement errors $$\rightarrow$$ Evaluation and uncertainty display:** Every stage of the pipeline introduces its own errors. The depth model misjudges distances, especially far away, the detector misses small targets, and the IMU, camera calibration and lens distortion shift the bearing, with sideways errors growing with range. These errors need to be measured against ground-truth data. The resulting error model can then be shown on the radar itself: instead of exact points, each target can be drawn with an error ellipse showing at a glance how reliable its position is. Tracking could further refine these ellipses, shrinking them as a target is repeatedly observed and growing them while it is occluded.
 
 
-# Future work
+
 
 # References
 
