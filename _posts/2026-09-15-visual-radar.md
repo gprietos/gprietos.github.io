@@ -178,7 +178,7 @@ Understanding the distinction between depth and range is critical for radar visu
 
 
 <div style="width: 75%; margin: 0 auto;" markdown="1">
-{% include embed/video.html src='/assets/videos/visual_radar/DepthRangeFocalExperiment.mp4' title='' %}
+{% include embed/video.html src='/assets/videos/visual_radar/DepthVsRange.mp4' title='' %}
 </div>
 
 
