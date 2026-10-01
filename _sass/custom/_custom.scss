@@ -257,3 +257,13 @@ header .post-meta span + span::before {
   max-height: none !important;
   overflow: visible !important;
 }
+
+/* Safety net for display math that MathJax can't line-break (e.g. a single
+   matrix wider than a phone screen): scroll that equation on its own
+   instead of letting it widen the whole page. overflow-y: hidden stops
+   some browsers from adding a stray vertical scrollbar to the box. */
+mjx-container[display="true"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
