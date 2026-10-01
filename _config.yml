@@ -16,12 +16,12 @@ timezone:
 
 title: DL with Guille # the main title
 
-tagline: Notes on Deep Learning, Computer Vision & Robotics # it will display as the subtitle
+tagline: Deep Learning, Computer Vision & Robotics # it will display as the subtitle
 
 # Welcome banner shown above the post list on the home page (page 1 only).
 home_banner:
   title: "👋 Welcome to Deep Learning with Guille"
-  subtitle: "Practical, code-first notes on deep learning — models, papers, and experiments."
+  subtitle: "Learning notes and hands-on mini-projects on deep learning, computer vision, and robotics."
 
 description: >- # used by seo meta and the atom feed
   Learning notes and hands-on mini-projects on deep learning, computer vision
