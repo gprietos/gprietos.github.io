@@ -23,9 +23,11 @@ layout: compress
     <script>
       (function () {
         try {
+          // Remembered open/closed state is desktop-only: below 850px the
+          // sidebar is the theme's stock overlay menu, which always starts closed.
           var stored = localStorage.getItem('sidebar-open');
           var isDesktop = window.matchMedia('(min-width: 850px)').matches;
-          var shouldOpen = stored === '1' || (stored === null && isDesktop);
+          var shouldOpen = isDesktop && stored !== '0';
           if (shouldOpen) {
             document.body.setAttribute('sidebar-display', '');
             document.getElementById('sidebar').classList.add('z-2');
@@ -107,17 +109,21 @@ layout: compress
         if (!trigger || !mask) return;
 
         var STORAGE_KEY = 'sidebar-open';
+        var desktopQuery = window.matchMedia('(min-width: 850px)');
 
         try {
           var stored = localStorage.getItem(STORAGE_KEY);
-          var isDesktop = window.matchMedia('(min-width: 850px)').matches;
-          var shouldOpen = stored === '1' || (stored === null && isDesktop);
+          var shouldOpen = desktopQuery.matches && stored !== '0';
           if (shouldOpen) {
             trigger.click(); // reuses the theme's own toggle logic, keeps its internal state in sync
           }
         } catch (e) {}
 
+        // Only desktop toggles are remembered. On mobile the menu is usually
+        // closed by tapping the mask (not the trigger), so saving mobile opens
+        // would leave a stale '1' that reopened the menu on the next reload.
         function persist() {
+          if (!desktopQuery.matches) return;
           try {
             localStorage.setItem(STORAGE_KEY, document.body.hasAttribute('sidebar-display') ? '1' : '0');
           } catch (e) {}
