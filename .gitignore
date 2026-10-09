@@ -30,3 +30,6 @@ assets/js/dist
 *~
 .DS_Store
 Thumbs.db
+
+# Local working notes (temporary, not published)
+docs/
