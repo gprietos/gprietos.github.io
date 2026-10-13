@@ -1,0 +1,40 @@
+{% comment %}
+  Interactive "3-D shape → UMAP" figure: rotatable 3-D point cloud (left), its precomputed 2-D UMAP (right),
+  sliders for n_neighbors and min_dist, and shape buttons. Data comes from the umap-examples repo
+  (scripts/export_umap_explorer.py, staged in its blog/ folder), copied to `data`.
+
+  Usage: {% include umap/umap_explorer.html data='/assets/data/umap/umap_explorer' title='Caption...' %}
+  Optional: shape='mammoth' (initial shape).
+{% endcomment %}
+
+{% unless umap_explorer_loaded %}
+  {% assign umap_explorer_loaded = true %}
+  <link rel="stylesheet" href="{{ '/assets/css/umap/umap_explorer.css' | relative_url }}">
+  <script defer src="https://cdn.jsdelivr.net/npm/plotly.js-gl3d-dist-min@2.35.2/plotly-gl3d.min.js"></script>
+  <script defer src="{{ '/assets/js/umap/umap_explorer.js' | relative_url }}"></script>
+{% endunless %}
+
+<figure class="umap-explorer" data-src="{{ include.data | relative_url }}" data-shape="{{ include.shape }}">
+  <div class="ux-panels">
+    <div class="ux-col">
+      <div class="ux-label">Original data (3-D, drag to rotate)</div>
+      <div class="ux-plot ux-3d"></div>
+      <div class="ux-shapes" role="group" aria-label="Dataset"></div>
+    </div>
+    <div class="ux-col">
+      <div class="ux-label">UMAP (2-D)</div>
+      <div class="ux-plot ux-2d"></div>
+      <div class="ux-controls">
+        <label>
+          <span>n_neighbors <output class="ux-k-value"></output></span>
+          <input type="range" class="ux-k" min="0" step="1">
+        </label>
+        <label>
+          <span>min_dist <output class="ux-md-value"></output></span>
+          <input type="range" class="ux-md" min="0" step="1">
+        </label>
+      </div>
+    </div>
+  </div>
+  {% if include.title %}<figcaption><em>{{ include.title }}</em></figcaption>{% endif %}
+</figure>

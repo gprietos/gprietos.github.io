@@ -1,0 +1,45 @@
+{
+ "ks": [
+  5,
+  10,
+  15,
+  30,
+  50,
+  100,
+  200
+ ],
+ "min_dists": [
+  "0.0",
+  "0.1",
+  "0.25",
+  "0.5",
+  "0.8",
+  "0.99"
+ ],
+ "default": {
+  "k": 15,
+  "min_dist": "0.1"
+ },
+ "shapes": [
+  {
+   "key": "mammoth",
+   "title": "Mammoth"
+  },
+  {
+   "key": "swiss_roll",
+   "title": "Swiss roll"
+  },
+  {
+   "key": "linked_rings",
+   "title": "Linked rings"
+  },
+  {
+   "key": "torus",
+   "title": "Torus"
+  },
+  {
+   "key": "blobs",
+   "title": "Blobs"
+  }
+ ]
+}
