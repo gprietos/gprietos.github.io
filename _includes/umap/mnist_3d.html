@@ -1,0 +1,27 @@
+{% comment %}
+  Interactive 3-D UMAP of MNIST (like Figure 2 of PAIR's "Understanding UMAP"): every test digit drawn as its own image
+  with scatter-gl, slowly orbiting until dragged, with digit chips to highlight classes. Data comes from the
+  umap-examples repo (scripts/export_mnist_3d.py, staged in its blog/ folder), copied to `data`.
+
+  Usage: {% include umap/mnist_3d.html data='/assets/data/umap/mnist_3d' title='Caption...' %}
+{% endcomment %}
+
+{% unless umap_mnist3d_loaded %}
+  {% assign umap_mnist3d_loaded = true %}
+  <link rel="stylesheet" href="{{ '/assets/css/umap/mnist_3d.css' | relative_url }}">
+  <script defer src="https://cdn.jsdelivr.net/npm/three@0.125.2/build/three.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/scatter-gl@0.0.13/lib/scatter-gl.min.js"></script>
+  <script defer src="{{ '/assets/js/umap/mnist_3d.js' | relative_url }}"></script>
+{% endunless %}
+
+<figure class="umap-mnist3d" data-src="{{ include.data | relative_url }}">
+  <div class="m3-label">UMAP of MNIST (3-D, drag to rotate, scroll to zoom)</div>
+  <div class="m3-plot">
+    <div class="m3-buttons">
+      <button type="button" class="m3-orbit" title="Rotate automatically" hidden>⟳ rotate</button>
+      <button type="button" class="m3-reset" title="Back to the starting view" hidden>reset view</button>
+    </div>
+  </div>
+  <div class="m3-digits" role="group" aria-label="Highlight digits (shift-click to add)"></div>
+  {% if include.title %}<figcaption><em>{{ include.title }}</em></figcaption>{% endif %}
+</figure>

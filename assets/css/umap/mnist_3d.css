@@ -1,0 +1,85 @@
+/* Interactive 3-D UMAP of MNIST (_includes/umap/mnist_3d.html). Colors come from Chirpy's theme variables; the
+   scatter-gl canvas is painted with the page's background color by the script (it can't be transparent). */
+
+.umap-mnist3d {
+  margin: 1.5rem 0;
+}
+
+.umap-mnist3d .m3-label {
+  margin-bottom: 0.5rem;
+  font-size: 0.85rem;
+  opacity: 0.75;
+  text-align: center;
+}
+
+.umap-mnist3d .m3-plot {
+  position: relative;
+  width: 100%;
+  height: 480px;
+  border: 1px solid var(--main-border-color, rgba(128, 128, 128, 0.25));
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+@media (max-width: 700px) {
+  .umap-mnist3d .m3-plot {
+    height: 380px;
+  }
+}
+
+.umap-mnist3d .m3-buttons {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 1;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.umap-mnist3d .m3-buttons button {
+  padding: 0.1rem 0.5rem;
+  border: 1px solid var(--btn-border-color, rgba(128, 128, 128, 0.3));
+  border-radius: 0.4rem;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.umap-mnist3d .m3-buttons button[hidden] {
+  display: none;
+}
+
+.umap-mnist3d .m3-digits {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.6rem;
+}
+
+.umap-mnist3d .m3-digits button {
+  flex: 1 1 0; /* the ten chips share one row, even on phones */
+  max-width: 2.6rem;
+  padding: 0.15rem 0;
+  border: 2px solid transparent;
+  border-radius: 0.4rem;
+  color: #fff;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+/* While some digits are selected, the others fade like their points */
+.umap-mnist3d .m3-digits.m3-some button[aria-pressed="false"] {
+  opacity: 0.35;
+}
+
+.umap-mnist3d .m3-digits button[aria-pressed="true"] {
+  border-color: currentColor;
+}
+
+.umap-mnist3d figcaption {
+  margin-top: 0.6rem;
+  text-align: center;
+}
