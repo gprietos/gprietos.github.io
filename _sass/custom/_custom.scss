@@ -7,6 +7,16 @@
   scrollbar-gutter: stable;
 }
 
+/* The theme sizes the fixed sidebar with `height: 100%`, which on mobile
+   browsers with a collapsible toolbar resolves to the full (toolbar-hidden)
+   viewport, so the sidebar's bottom (mode toggle + contact links) sits
+   behind the browser bar until you scroll. 100dvh tracks the visible
+   viewport instead; browsers without dvh support ignore this and keep the
+   theme's 100%. */
+#sidebar {
+  height: 100dvh;
+}
+
 /* The mask (shown behind the always-overlay sidebar) is wired by the
    theme's own JS to close the sidebar on click - the built-in "tap
    outside to dismiss" behavior meant for the original mobile-only
