@@ -1,0 +1,352 @@
+/* Interactive uncertainty sampler toy (_includes/active_learning/uncertainty_toy.html). Text, borders and backgrounds
+   come from Chirpy's theme variables, so it follows the light/dark toggle; only the class colours and the band (hot)
+   have their own light/dark values, keyed on Chirpy's data-mode like the theme itself. */
+
+.uncertainty-toy {
+  margin: 1.5rem 0;
+}
+
+/* wide=true in the include: stick out of the text column on large screens */
+@media (min-width: 1200px) {
+  .uncertainty-toy.ust-wide-fig {
+    --ust-bleed: 80px;
+    width: calc(100% + 2 * var(--ust-bleed));
+    max-width: none;
+    margin-left: calc(-1 * var(--ust-bleed));
+  }
+}
+
+.uncertainty-toy .ust {
+  /* from the theme */
+  --ust-ink: var(--text-color, #34343c);
+  --ust-muted: var(--text-muted-color, #757575);
+  --ust-line: var(--btn-border-color, rgba(128, 128, 128, 0.3));
+  --ust-accent: var(--link-color, #0056b2);
+  --ust-card: var(--main-bg, #ffffff);
+  --ust-surface: var(--main-bg, #ffffff);
+  --ust-sunk: var(--highlight-bg-color, #f6f8fa);
+  /* own colours (they carry meaning) */
+  --ust-hot: #b45f00;
+  --ust-hot-soft: #fbe8d2;
+  --ust-off: #a7b0b9;
+  --ust-car: #23797f;
+  --ust-pedestrian: #a8336f;
+  --ust-cyclist: #5f7d14;
+  --ust-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  container-type: inline-size;
+  color: var(--ust-ink);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  min-width: 0;
+}
+
+:root[data-mode="dark"] .uncertainty-toy .ust {
+  --ust-hot: #f2a54c;
+  --ust-hot-soft: #3b2b17;
+  --ust-off: #5c6772;
+  --ust-car: #5cc4ca;
+  --ust-pedestrian: #e87db6;
+  --ust-cyclist: #aacb5c;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mode]) .uncertainty-toy .ust {
+    --ust-hot: #f2a54c;
+    --ust-hot-soft: #3b2b17;
+    --ust-off: #5c6772;
+    --ust-car: #5cc4ca;
+    --ust-pedestrian: #e87db6;
+    --ust-cyclist: #aacb5c;
+  }
+}
+
+.uncertainty-toy .ust *,
+.uncertainty-toy .ust *::before,
+.uncertainty-toy .ust *::after {
+  box-sizing: border-box;
+}
+
+.uncertainty-toy .ust p {
+  margin: 0;
+}
+
+/* layout: settings | class table, w(d) | H(p), images across */
+.uncertainty-toy .ust-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.uncertainty-toy .ust-wide {
+  grid-column: 1 / -1;
+}
+
+@container (max-width: 640px) {
+  .uncertainty-toy .ust-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.uncertainty-toy .ust-panel {
+  border: 1px solid var(--ust-line);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.uncertainty-toy .ust-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.uncertainty-toy .ust-eyebrow {
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.75;
+}
+
+.uncertainty-toy .ust-reset {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--ust-line);
+  border-radius: 0.4rem;
+  background: transparent;
+  color: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.uncertainty-toy .ust-reset:hover {
+  border-color: var(--ust-accent);
+}
+
+/* controls */
+.uncertainty-toy .ust-ctls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem 0.9rem;
+}
+
+.uncertainty-toy .ust-ctl {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.uncertainty-toy .ust-ctl label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.uncertainty-toy .ust-ctl output,
+.uncertainty-toy .ust-out {
+  font-family: var(--ust-mono);
+  font-size: 0.78rem;
+  color: var(--ust-accent);
+}
+
+.uncertainty-toy .ust input[type="range"] {
+  width: 100%;
+  margin: 3px 0;
+  accent-color: var(--ust-accent);
+  background: transparent;
+}
+
+.uncertainty-toy .ust input[type="number"] {
+  width: 4.6em;
+  padding: 1px 4px;
+  border: 1px solid var(--ust-line);
+  border-radius: 0.3rem;
+  background: var(--ust-card);
+  color: var(--ust-ink);
+  font-family: var(--ust-mono);
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.uncertainty-toy .ust input:focus-visible,
+.uncertainty-toy .ust button:focus-visible,
+.uncertainty-toy .ust summary:focus-visible {
+  outline: 2px solid var(--ust-accent);
+  outline-offset: 2px;
+}
+
+/* plots */
+.uncertainty-toy .ust svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.uncertainty-toy .ust svg text {
+  font-family: var(--ust-mono);
+  font-size: 12px;
+  fill: var(--ust-muted);
+}
+
+/* tables (override Chirpy's post table styles) */
+.uncertainty-toy .ust-tw {
+  overflow-x: auto;
+  min-width: 0;
+}
+
+.uncertainty-toy .ust table {
+  display: table;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  background: transparent;
+  font-family: var(--ust-mono);
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.uncertainty-toy .ust tr,
+.uncertainty-toy .ust thead tr,
+.uncertainty-toy .ust tbody tr {
+  background: transparent !important;
+}
+
+.uncertainty-toy .ust th {
+  padding: 0.25rem 0.4rem;
+  border: 0;
+  border-bottom: 1px solid var(--ust-line);
+  background: transparent;
+  color: var(--ust-muted);
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.uncertainty-toy .ust td {
+  padding: 0.25rem 0.4rem;
+  border: 0;
+  border-bottom: 1px solid var(--ust-line);
+  background: transparent;
+  color: var(--ust-ink);
+  text-align: right;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+.uncertainty-toy .ust tr:last-child td {
+  border-bottom: 0;
+}
+
+.uncertainty-toy .ust th:first-child,
+.uncertainty-toy .ust td:first-child {
+  text-align: left;
+}
+
+.uncertainty-toy .ust td.ust-ap div {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.uncertainty-toy .ust td.ust-ap input {
+  min-width: 70px;
+}
+
+.uncertainty-toy .ust tr.ust-offrow td {
+  color: var(--ust-off);
+  text-decoration: line-through;
+}
+
+.uncertainty-toy .ust-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.uncertainty-toy .ust-dot {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+/* image cards */
+.uncertainty-toy .ust-imgs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.uncertainty-toy .ust-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding: 0.4rem;
+  border: 1px solid var(--ust-line);
+  border-radius: 0.4rem;
+}
+
+.uncertainty-toy .ust-card.ust-top {
+  border-color: var(--ust-hot);
+  box-shadow: 0 0 0 1px var(--ust-hot);
+}
+
+.uncertainty-toy .ust-card-h {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.4rem;
+  font-family: var(--ust-mono);
+  font-size: 0.78rem;
+}
+
+.uncertainty-toy .ust-card-h b {
+  font-size: 0.875rem;
+}
+
+.uncertainty-toy .ust-rankb {
+  color: var(--ust-muted);
+  font-family: var(--ust-mono);
+  font-size: 0.72rem;
+}
+
+.uncertainty-toy .ust-card.ust-top .ust-rankb {
+  color: var(--ust-hot);
+  font-weight: 600;
+}
+
+.uncertainty-toy .ust-note {
+  color: var(--ust-muted);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.uncertainty-toy .ust details summary {
+  color: var(--ust-muted);
+  font-family: var(--ust-mono);
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.uncertainty-toy .ust details table {
+  margin-top: 2px;
+  font-size: 0.72rem;
+}
+
+.uncertainty-toy .ust details th,
+.uncertainty-toy .ust details td {
+  padding: 2px 4px;
+}
+
+.uncertainty-toy figcaption {
+  margin-top: 0.6rem;
+  text-align: center;
+}

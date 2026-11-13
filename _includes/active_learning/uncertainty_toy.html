@@ -1,0 +1,20 @@
+{% comment %}
+  Interactive uncertainty sampler toy: class difficulty table and settings (top), class weight w(d) and box entropy
+  H(p) (middle), example images with their score U and rank (bottom). Source of the maths: the al_object_detection
+  UncertaintySampler (threshold sum). Built by assets/js/active_learning/uncertainty_toy.js.
+
+  Usage: {% include active_learning/uncertainty_toy.html title='Caption...' %}
+  Optional: wide=true (on screens >= 1200px the toy sticks out 80px past each side of the text column;
+  change --ust-bleed in assets/css/active_learning/uncertainty_toy.css).
+{% endcomment %}
+
+{% unless uncertainty_toy_loaded %}
+  {% assign uncertainty_toy_loaded = true %}
+  <link rel="stylesheet" href="{{ '/assets/css/active_learning/uncertainty_toy.css' | relative_url }}">
+  <script defer src="{{ '/assets/js/active_learning/uncertainty_toy.js' | relative_url }}"></script>
+{% endunless %}
+
+<figure class="uncertainty-toy{% if include.wide %} ust-wide-fig{% endif %}">
+  <div class="ust" data-ust="toy"></div>
+  {% if include.title %}<figcaption><em>{{ include.title }}</em></figcaption>{% endif %}
+</figure>

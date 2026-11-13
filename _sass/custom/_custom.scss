@@ -268,6 +268,14 @@ header .post-meta span + span::before {
   overflow: visible !important;
 }
 
+/* The theme sets `white-space: nowrap` on every table cell, so a table with
+   sentence-length cells grows wider than its container and gets a
+   horizontal scrollbar. Inside callouts (> ... {: .prompt-* }) the column
+   is narrower still, so let body cells wrap there. Headers stay on one line. */
+blockquote[class^="prompt-"] .table-wrapper > table td {
+  white-space: normal;
+}
+
 /* Safety net for display math that MathJax can't line-break (e.g. a single
    matrix wider than a phone screen): scroll that equation on its own
    instead of letting it widen the whole page. overflow-y: hidden stops

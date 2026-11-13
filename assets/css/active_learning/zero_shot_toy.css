@@ -1,0 +1,280 @@
+/* Interactive zero-shot detection toy (_includes/active_learning/zero_shot_toy.html). Text, borders and backgrounds
+   come from Chirpy's theme variables, so it follows the light/dark toggle; only the class colours have their own
+   light/dark values, keyed on Chirpy's data-mode like the theme itself. */
+
+.zero-shot-toy {
+  margin: 1.5rem 0;
+}
+
+/* wide=true in the include: stick out of the text column on large screens */
+@media (min-width: 1200px) {
+  .zero-shot-toy.zst-wide-fig {
+    --zst-bleed: 80px;
+    width: calc(100% + 2 * var(--zst-bleed));
+    max-width: none;
+    margin-left: calc(-1 * var(--zst-bleed));
+  }
+}
+
+.zero-shot-toy .zst {
+  /* from the theme */
+  --zst-ink: var(--text-color, #34343c);
+  --zst-muted: var(--text-muted-color, #757575);
+  --zst-line: var(--btn-border-color, rgba(128, 128, 128, 0.3));
+  --zst-accent: var(--link-color, #0056b2);
+  --zst-card: var(--main-bg, #ffffff);
+  --zst-sunk: var(--highlight-bg-color, #f6f8fa);
+  /* own colours (they carry meaning): one per class; ground truth = dashed, in the class colour, over a dark halo */
+  --zst-gt-halo: rgba(0, 0, 0, 0.75);
+  --zst-car: #4cc3ff;
+  --zst-pedestrian: #ff5fb0;
+  --zst-van: #ffd23f;
+  --zst-truck: #ff8c42;
+  --zst-cyclist: #b8f04a;
+  --zst-tram: #c792ff;
+  --zst-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  container-type: inline-size;
+  color: var(--zst-ink);
+  font-size: 0.875rem;
+  line-height: 1.45;
+  min-width: 0;
+}
+
+/* The boxes are drawn on photographs, so the class colours are the same in both modes; the legend dots use them too. */
+
+.zero-shot-toy .zst *,
+.zero-shot-toy .zst *::before,
+.zero-shot-toy .zst *::after {
+  box-sizing: border-box;
+}
+
+.zero-shot-toy .zst p {
+  margin: 0;
+}
+
+.zero-shot-toy .zst-panel {
+  border: 1px solid var(--zst-line);
+  border-radius: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+/* controls row: threshold | ground truth | legend */
+.zero-shot-toy .zst-ctls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 1.2rem;
+}
+
+.zero-shot-toy .zst-ctl {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1 1 200px;
+  max-width: 320px;
+}
+
+.zero-shot-toy .zst-ctl label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  margin: 0;
+  font-size: 0.82rem;
+}
+
+.zero-shot-toy .zst-ctl output {
+  font-family: var(--zst-mono);
+  font-size: 0.78rem;
+  color: var(--zst-accent);
+}
+
+.zero-shot-toy .zst input[type="range"] {
+  width: 100%;
+  margin: 3px 0;
+  accent-color: var(--zst-accent);
+  background: transparent;
+}
+
+.zero-shot-toy .zst-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding-bottom: 0.3rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.zero-shot-toy .zst-switch input {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  accent-color: var(--zst-accent);
+}
+
+.zero-shot-toy .zst-switch .zst-gtdot {
+  width: 14px;
+  height: 9px;
+  border: 2px dashed var(--zst-ink);
+  border-radius: 2px;
+}
+
+.zero-shot-toy .zst-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.2rem 0.7rem;
+  padding-bottom: 0.3rem;
+  font-size: 0.78rem;
+}
+
+.zero-shot-toy .zst-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+.zero-shot-toy .zst-dot {
+  display: inline-block;
+  flex: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+}
+
+.zero-shot-toy .zst input:focus-visible,
+.zero-shot-toy .zst button:focus-visible {
+  outline: 2px solid var(--zst-accent);
+  outline-offset: 2px;
+}
+
+/* the current image with its boxes */
+.zero-shot-toy .zst-stage {
+  position: relative;
+  width: 100%;
+  background: var(--zst-sunk);
+  border-radius: 0.4rem;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.zero-shot-toy .zst-stage img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.zero-shot-toy .zst-stage svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+  /* --zst-k = image pixels per screen pixel (set by the script), so lines and text keep their screen size */
+  --zst-k: 1;
+}
+
+.zero-shot-toy .zst-stage svg .zst-pred {
+  fill: none;
+  stroke-width: calc(2px * var(--zst-k));
+}
+
+.zero-shot-toy .zst-stage svg .zst-gtbox {
+  fill: none;
+  stroke-width: calc(2px * var(--zst-k));
+  stroke-dasharray: calc(6px * var(--zst-k)) calc(4px * var(--zst-k));
+}
+
+.zero-shot-toy .zst-stage svg .zst-gthalo {
+  fill: none;
+  stroke: var(--zst-gt-halo);
+  stroke-width: calc(4px * var(--zst-k));
+}
+
+.zero-shot-toy .zst-stage svg text {
+  font-family: var(--zst-mono);
+  font-size: calc(11px * var(--zst-k));
+  font-weight: 600;
+  fill: #111;
+}
+
+.zero-shot-toy .zst-stage svg .zst-tag {
+  stroke: none;
+}
+
+/* readout under the image */
+.zero-shot-toy .zst-info {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.2rem 1rem;
+  font-family: var(--zst-mono);
+  font-size: 0.76rem;
+  color: var(--zst-muted);
+}
+
+.zero-shot-toy .zst-info b {
+  color: var(--zst-ink);
+  font-weight: 600;
+}
+
+/* thumbnails */
+.zero-shot-toy .zst-thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.4rem;
+}
+
+.zero-shot-toy .zst-thumb {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 2px solid transparent;
+  border-radius: 0.3rem;
+  background: var(--zst-sunk);
+  cursor: pointer;
+  overflow: hidden;
+  line-height: 0;
+  opacity: 0.75;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.zero-shot-toy .zst-thumb img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.zero-shot-toy .zst-thumb:hover {
+  opacity: 1;
+}
+
+.zero-shot-toy .zst-thumb[aria-current="true"] {
+  border-color: var(--zst-accent);
+  opacity: 1;
+}
+
+.zero-shot-toy .zst-note {
+  color: var(--zst-muted);
+  font-size: 0.75rem;
+  line-height: 1.3;
+}
+
+.zero-shot-toy figcaption {
+  margin-top: 0.6rem;
+  text-align: center;
+}

@@ -1,0 +1,21 @@
+{% comment %}
+  Interactive zero-shot detection toy: OWLv2 boxes on KITTI frames, precomputed (examples/zero_shot_toy_kitti.py).
+  Threshold slider, ground-truth toggle, found / missed / false counts with precision and recall at the threshold
+  (same class, IoU >= 0.5, one match per ground-truth box), thumbnails below the current image (click to load). Built by
+  assets/js/active_learning/zero_shot_toy.js from the JSON in data-src; images are next to it (img/).
+
+  Usage: {% include active_learning/zero_shot_toy.html title='Caption...' %}
+  Optional: wide=true (on screens >= 1200px the toy sticks out 80px past each side of the text column;
+  change --zst-bleed in assets/css/active_learning/zero_shot_toy.css).
+{% endcomment %}
+
+{% unless zero_shot_toy_loaded %}
+  {% assign zero_shot_toy_loaded = true %}
+  <link rel="stylesheet" href="{{ '/assets/css/active_learning/zero_shot_toy.css' | relative_url }}">
+  <script defer src="{{ '/assets/js/active_learning/zero_shot_toy.js' | relative_url }}"></script>
+{% endunless %}
+
+<figure class="zero-shot-toy{% if include.wide %} zst-wide-fig{% endif %}">
+  <div class="zst" data-zst="toy" data-src="{{ '/assets/img/active_learning/zero_shot_toy/data.json' | relative_url }}"></div>
+  {% if include.title %}<figcaption><em>{{ include.title }}</em></figcaption>{% endif %}
+</figure>
